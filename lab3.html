@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>MSIS-4565 Lab 3 - Canvas Drawing</title>
+	<style type="text/css">
+		#content-wrapper {
+			width: 600px;
+			margin: 0 auto;
+			text-align: center;
+		}
+		#canvasRun {
+			background-color: #c00;
+			border: 0;
+			color: #fff;
+		}
+	</style>
+</head>
+<body>
+	<div id="content-wrapper">
+		<button id="canvasRun">Draw Canvas</button><br><br>
+		<canvas id="myCanvas" width="600" height="450"></canvas>
+	</div>
+	<script type="text/javascript">
+		//Method to attach event listener once all elements of the page have loaded.
+		function init() {
+			document.getElementById("canvasRun").addEventListener("click", drawCanvas);
+		}
+		//On click handler for the canvasRun button
+		//Starts the timer and disables the button to avoid being clicked repeatedly
+		function drawCanvas() {
+			//Load the Marist banner image to DOM
+			var banner = document.createElement("img");
+			//banner.src = "marist.png"
+			banner.id = "banner"
+			banner.style.display = 'none';
+			var parent = document.getElementById("content-wrapper");
+			parent.appendChild(banner);
+			//Get reference to the canvas
+			var canvas = document.getElementById("myCanvas");
+			//If canvas not suppported, display error and return
+			if(!(canvas.getContext && canvas.getContext('2d'))) {
+				alert("Sorry canvas not supported.");
+				return;
+			}
+			var context = canvas.getContext('2d');
+			var index = 0;
+			setInterval(function() {
+				drawElements(context, index);
+				index++;
+			}, 33); //To achieve a frame rate of approx. 30fps
+			document.getElementById("canvasRun").disabled = true;
+		}
+		//Method to draw each and every element on the canvas
+		function drawElements(context, count) {
+			drawGradientBackground(context);
+			drawTitle(context);
+			drawCircle(context);
+			drawTriangle(context);
+			drawFootnote(context);
+			drawQuadraticWave(context);
+			drawBanner(context);
+			animateSquare(context, count);
+			animateSpinner(context, count);
+		}
+		//For the linear gradient background
+		function drawGradientBackground(context) {
+			var background = context.createLinearGradient(0, 0, 0, context.canvas.height);
+			background.addColorStop(0, "#FFFFFF");
+			background.addColorStop(0.1,"#EEEEEE");
+			background.addColorStop(0.2,"#DDDDDD");
+			background.addColorStop(0.3,"#CCCCCC");
+			background.addColorStop(0.4,"#AAAAAA");
+			background.addColorStop(0.5,"#888888");
+			background.addColorStop(0.6,"#666666");
+			background.addColorStop(0.7,"#555555");
+			background.addColorStop(0.8,"#444444");
+			background.addColorStop(0.9,"#222222");
+			background.addColorStop(1, "#000000");
+			context.fillStyle = background;
+			context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+		}
+		//For the title text and ruler
+		function drawTitle(context) {
+			context.fillStyle="#C80000";
+			context.font = "32px sans-serif";
+			context.fillText("MSIS-4565 Canvas Lab", 150, 50);
+			context.beginPath();
+			context.moveTo(20,60);
+			context.lineTo(context.canvas.width - 20, 60);
+			context.strokeStyle = "#C80000";
+			context.lineWidth = 2.5;
+			context.stroke();
+		}
+		//For the circle with a border
+		function drawCircle(context) {
+			context.beginPath();
+			context.arc(100, 160, 60, 0, 2 * Math.PI);
+			context.fillStyle = "#0000C8";
+			context.fill();
+			context.lineWidth = 2.5;
+			context.strokeStyle = "#FFFFFF";
+			context.stroke();
+		}
+		//For the triangle
+		function drawTriangle(context) {
+			context.beginPath();
+			context.moveTo(100,250);
+			context.lineTo(40,350);
+			context.lineTo(160,350);
+			context.fillStyle = "#00C800";
+			context.fill();
+		}
+		//For the name and email text
+		function drawFootnote(context) {
+			context.fillStyle="#FFFFFF";
+			context.font = "14px sans-serif";
+			context.fillText("Dhanesh kumar", 20, 410);
+			context.fillText("dhanesh.chandrasekaran1@marist.edu", 20, 430);
+		}
+		//For the dash styled quadratic curves in white background
+		function drawQuadraticWave(context) {
+			context.fillStyle = "#FFFFFF";
+			context.fillRect(250, 250, 325, 100);
+			context.setLineDash([10, 6]);
+			context.beginPath();
+			context.moveTo(280, 300);
+			context.quadraticCurveTo(347, 250, 415, 300);
+			context.moveTo(415, 300);
+			context.quadraticCurveTo(482, 350, 540, 300);
+			context.lineWidth = 2;
+			context.strokeStyle = "#000000";
+			context.stroke();
+			context.setLineDash([]);
+		}
+		//For the IIT Banner image
+		function drawBanner(context) {
+			var banner = document.getElementById("banner");
+			var prefered_width = 250;
+			//Scaling done while preserving the aspect ratio
+			var scaled_height = (prefered_width / banner.width) * banner.height;
+			context.drawImage(banner, 320, 370, prefered_width, scaled_height);
+		}
+		//For the rotating square with white border
+		function animateSquare(context, count) {
+			context.save();
+			context.translate(500, 155);
+			context.rotate((count / 360) * (2 * Math.PI));
+			context.translate(-500, -155);
+			context.fillStyle = "#FFFFFF";
+			context.fillRect(435, 90, 130, 130);
+			context.fillStyle = "#C80000";
+			context.fillRect(440, 95, 120, 120);
+			context.restore();
+		}
+		//For the rotating arc element
+		function animateSpinner(context, count) {
+			count *= 12; //To increase the speed of the animation
+			context.save();
+			context.translate(290, 160);
+			context.rotate((count / 360) * (2 * Math.PI));
+			context.translate(-290, -160);
+			context.beginPath();
+			context.arc(290, 160, 60, (1.5 * Math.PI), (0.33 * Math.PI));
+			context.lineWidth = 16;
+			context.strokeStyle = "#FFA500";
+			context.stroke();
+			context.restore();
+		}
+		//When all the elements of the page loads, call the init method.
+		window.onload = init();
+	</script>
+</body>
+</html>
